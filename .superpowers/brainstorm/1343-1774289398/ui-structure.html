@@ -1,0 +1,87 @@
+<h2>Structure de l'interface</h2>
+<p class="subtitle">3 écrans principaux — clique sur celui qui te semble le plus naturel comme point d'entrée</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="dashboard" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a;padding:16px;font-family:monospace;font-size:12px;color:#94a3b8">
+      <div style="color:#f1f5f9;font-weight:bold;margin-bottom:12px;font-size:13px">🏠 Home — Mes groupes</div>
+      <div style="background:#1e293b;border-radius:8px;padding:10px;margin-bottom:8px">
+        <div style="color:#a78bfa;font-size:11px;font-weight:bold">BE BETTER SON</div>
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+          <span style="background:#ef4444;color:white;padding:2px 6px;border-radius:4px;font-size:10px">📞 Appeler — EN RETARD</span>
+          <span style="background:#f97316;color:white;padding:2px 6px;border-radius:4px;font-size:10px">🎂 Anniversaire — 3j</span>
+          <span style="background:#22c55e;color:white;padding:2px 6px;border-radius:4px;font-size:10px">🍽️ Repas — 12j</span>
+        </div>
+      </div>
+      <div style="background:#1e293b;border-radius:8px;padding:10px">
+        <div style="color:#34d399;font-size:11px;font-weight:bold">BE BETTER DAD CAT</div>
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+          <span style="background:#22c55e;color:white;padding:2px 6px;border-radius:4px;font-size:10px">💊 Vermifuge — 18j</span>
+          <span style="background:#ef4444;color:white;padding:2px 6px;border-radius:4px;font-size:10px">🎮 Jouer — EN RETARD</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Vue groupes (Home)</h3>
+      <p>La home affiche directement tous les groupes avec un aperçu des actions urgentes. Tu vois l'état global en un coup d'œil.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="group-focus" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a;padding:16px;font-family:monospace;font-size:12px;color:#94a3b8">
+      <div style="color:#f1f5f9;font-weight:bold;margin-bottom:12px;font-size:13px">📂 Groupe ouvert</div>
+      <div style="color:#a78bfa;font-size:11px;font-weight:bold;margin-bottom:8px">← BE BETTER SON</div>
+      <div style="background:#1e293b;border-radius:8px;padding:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="color:#f1f5f9;font-size:11px">📞 Appeler mes parents</div>
+          <div style="color:#ef4444;font-size:10px;margin-top:2px">En retard de 3 jours</div>
+        </div>
+        <span style="background:#22c55e;color:white;padding:4px 10px;border-radius:20px;font-size:10px;cursor:pointer">✓ Fait</span>
+      </div>
+      <div style="background:#1e293b;border-radius:8px;padding:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="color:#f1f5f9;font-size:11px">🎂 Anniversaire Papa</div>
+          <div style="color:#f97316;font-size:10px;margin-top:2px">Dans 3 jours • 15 mars</div>
+        </div>
+        <span style="background:#22c55e;color:white;padding:4px 10px;border-radius:20px;font-size:10px;cursor:pointer">✓ Fait</span>
+      </div>
+      <div style="background:#1e293b;border-radius:8px;padding:10px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="color:#f1f5f9;font-size:11px">🍽️ Programmer un repas</div>
+          <div style="color:#22c55e;font-size:10px;margin-top:2px">Dans 12 jours</div>
+        </div>
+        <span style="background:#22c55e;color:white;padding:4px 10px;border-radius:20px;font-size:10px;cursor:pointer">✓ Fait</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Vue groupe détaillée</h3>
+      <p>Chaque groupe s'ouvre en pleine page avec toutes ses actions. Le bouton "✓ Fait" est bien visible sur chaque carte.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="urgent-first" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a;padding:16px;font-family:monospace;font-size:12px;color:#94a3b8">
+      <div style="color:#f1f5f9;font-weight:bold;margin-bottom:12px;font-size:13px">🔥 Vue "À faire maintenant"</div>
+      <div style="color:#ef4444;font-size:11px;font-weight:bold;margin-bottom:6px">EN RETARD (2)</div>
+      <div style="background:#450a0a;border:1px solid #ef4444;border-radius:8px;padding:8px;margin-bottom:5px;display:flex;justify-content:space-between">
+        <div><div style="color:#fca5a5;font-size:11px">📞 Appeler mes parents</div><div style="color:#94a3b8;font-size:10px">Be better son</div></div>
+        <span style="background:#22c55e;color:white;padding:3px 8px;border-radius:20px;font-size:10px">✓</span>
+      </div>
+      <div style="background:#450a0a;border:1px solid #ef4444;border-radius:8px;padding:8px;margin-bottom:10px;display:flex;justify-content:space-between">
+        <div><div style="color:#fca5a5;font-size:11px">🎮 Jouer avec le chat</div><div style="color:#94a3b8;font-size:10px">Be better dad cat</div></div>
+        <span style="background:#22c55e;color:white;padding:3px 8px;border-radius:20px;font-size:10px">✓</span>
+      </div>
+      <div style="color:#f97316;font-size:11px;font-weight:bold;margin-bottom:6px">BIENTÔT DÛ (1)</div>
+      <div style="background:#431407;border:1px solid #f97316;border-radius:8px;padding:8px;display:flex;justify-content:space-between">
+        <div><div style="color:#fdba74;font-size:11px">🎂 Anniversaire Papa</div><div style="color:#94a3b8;font-size:10px">Be better son • dans 3j</div></div>
+        <span style="background:#22c55e;color:white;padding:3px 8px;border-radius:20px;font-size:10px">✓</span>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Vue "Urgences" globale</h3>
+      <p>La home regroupe toutes les actions urgentes de tous les groupes, triées par priorité. Idéal si tu veux juste savoir quoi faire maintenant.</p>
+    </div>
+  </div>
+
+</div>
