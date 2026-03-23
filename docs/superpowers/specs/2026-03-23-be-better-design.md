@@ -83,7 +83,7 @@
 | id | uuid | Clé primaire |
 | text | text | Phrase d'encouragement |
 | author_id | uuid | Référence vers `users.id` (null si système) |
-| status | enum | `active`, `pending`, `rejected` |
+| status | enum | `active`, `rejected` — (`pending` réservé pour v2 soumission communautaire) |
 | created_at | timestamptz | Date de soumission |
 
 ### `group_invitations`
@@ -115,14 +115,20 @@ Le statut est calculé à la volée depuis `action_completions` :
 **Mode `fixed` :**
 - `next_due` = prochaine occurrence de `fixed_month/fixed_day` dans l'année courante ou suivante
 - La validation marque l'action comme faite pour l'année en cours
+- `sync_mode` s'applique aussi aux actions `fixed` :
+  - `shared` : l'action est considérée faite pour l'année dès qu'un membre valide
+  - `individual` : chaque membre doit valider indépendamment chaque année
+- `warning_days` pour les actions `fixed` : défaut à **7 jours** avant `next_due` (pas de calcul basé sur une période)
+- Barre de progression : la période totale est l'intervalle entre la précédente et la prochaine occurrence de `fixed_month/fixed_day`
+- `never_done` prend la priorité sur `overdue` quand il n'y a aucune completion (même si la date fixe est passée)
 
-**États visuels :**
-| Statut | Condition | Couleur |
-|---|---|---|
-| `overdue` | `now > next_due` | Rouge |
-| `warning` | `now > next_due - warning_days` | Orange |
-| `ok` | Dans les temps | Vert |
-| `never_done` | Aucune completion | Gris |
+**États visuels (évalués dans cet ordre, priorité décroissante) :**
+| Priorité | Statut | Condition | Couleur |
+|---|---|---|---|
+| 1 | `never_done` | Aucune completion | Gris |
+| 2 | `overdue` | `now > next_due` | Rouge |
+| 3 | `warning` | `now > next_due - warning_days` | Orange |
+| 4 | `ok` | Dans les temps | Vert |
 
 ### Phrases d'encouragement
 
@@ -160,9 +166,10 @@ Au moment de la validation (création d'une `action_completion`), une phrase est
 ## 6. Notifications (v1)
 
 Un cron job quotidien (Supabase Edge Function ou Vercel Cron) :
-1. Récupère toutes les actions dont `next_due <= now + 24h`
-2. Groupe par utilisateur
-3. Envoie un email récapitulatif via **Resend** listant les actions à faire
+1. Pour chaque action en mode `shared` : calcule `next_due` depuis la dernière completion de n'importe quel membre ; notifie **tous les membres** si `next_due <= now + 24h`
+2. Pour chaque action en mode `individual` : calcule `next_due` **par utilisateur** depuis sa propre dernière completion ; notifie uniquement les utilisateurs pour lesquels `next_due <= now + 24h`
+3. Groupe les alertes par utilisateur
+4. Envoie un email récapitulatif via **Resend** listant les actions à faire
 
 Format email : simple, lisible, avec un lien direct vers l'app.
 
@@ -175,6 +182,18 @@ Format email : simple, lisible, avec un lien direct vers l'app.
 3. Le destinataire clique le lien → s'inscrit ou se connecte → rejoint le groupe comme `member`
 4. Il voit immédiatement les actions du groupe avec leurs statuts
 5. Le lien expire après 7 jours
+
+### Règles d'invitation
+- Un lien est **à usage unique** : une fois accepté, le token devient invalide
+- Plusieurs invitations actives simultanées pour un même groupe sont autorisées (une par destinataire)
+- Si un utilisateur déjà membre clique un lien d'invitation : on l'informe qu'il est déjà membre, pas d'erreur
+- Si le owner clique son propre lien : même comportement, ignoré silencieusement
+
+### Règles de membership
+- Pas de limite de membres par groupe en v1
+- Un `member` ne peut pas devenir `owner` en v1 (pas de transfert de propriété)
+- Un membre peut quitter un groupe à tout moment (suppression de la ligne `group_members`)
+- Le owner ne peut pas quitter son propre groupe (il doit le supprimer)
 
 ---
 
