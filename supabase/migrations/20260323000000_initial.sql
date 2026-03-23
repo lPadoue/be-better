@@ -1,5 +1,6 @@
 -- Extensions
 create extension if not exists "uuid-ossp";
+create extension if not exists "pgcrypto";
 
 -- Enums
 create type public.member_role as enum ('owner', 'member');
@@ -77,6 +78,7 @@ create table public.group_invitations (
   group_id uuid references public.groups(id) on delete cascade not null,
   invited_by uuid references public.users(id) on delete cascade not null,
   email text,
+  created_at timestamptz default now() not null,
   token text unique not null default encode(gen_random_bytes(32), 'hex'),
   status public.invitation_status not null default 'pending',
   expires_at timestamptz not null default (now() + interval '7 days')
@@ -90,6 +92,12 @@ alter table public.actions enable row level security;
 alter table public.action_completions enable row level security;
 alter table public.encouragements enable row level security;
 alter table public.group_invitations enable row level security;
+
+-- Security definer function to avoid RLS recursion
+create or replace function public.is_group_member(p_group_id uuid)
+returns boolean language sql security definer set search_path = public as $$
+  select exists (select 1 from public.group_members where group_id = p_group_id and user_id = auth.uid());
+$$;
 
 -- users policies
 create policy "users_select_own" on public.users for select using (auth.uid() = id);
@@ -105,7 +113,7 @@ create policy "groups_delete_owner" on public.groups for delete using (owner_id 
 
 -- group_members policies
 create policy "group_members_select" on public.group_members for select
-  using (exists (select 1 from public.group_members gm where gm.group_id = group_id and gm.user_id = auth.uid()));
+  using (public.is_group_member(group_id));
 create policy "group_members_insert_self" on public.group_members for insert with check (user_id = auth.uid());
 create policy "group_members_delete_self" on public.group_members for delete using (user_id = auth.uid());
 
@@ -135,6 +143,8 @@ create policy "completions_insert_members" on public.action_completions for inse
       where a.id = action_id and gm.user_id = auth.uid()
     )
   );
+create policy "completions_delete_own" on public.action_completions for delete
+  using (user_id = auth.uid());
 
 -- encouragements: authenticated users can read active
 create policy "encouragements_select_active" on public.encouragements
@@ -148,6 +158,10 @@ create policy "invitations_select" on public.group_invitations for select
   );
 create policy "invitations_insert_owner" on public.group_invitations for insert
   with check (exists (select 1 from public.groups where id = group_id and owner_id = auth.uid()));
+create policy "invitations_update_token_holder" on public.group_invitations for update
+  using (invited_by = auth.uid());
+create policy "invitations_delete_owner" on public.group_invitations for delete
+  using (exists (select 1 from public.groups where id = group_id and owner_id = auth.uid()));
 
 -- Auto-create user profile on sign up
 create or replace function public.handle_new_user()
@@ -167,3 +181,9 @@ $$;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+-- Performance indexes
+create index on public.action_completions (action_id);
+create index on public.action_completions (user_id);
+create index on public.group_invitations (token);
+create index on public.group_invitations (group_id);
