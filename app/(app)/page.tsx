@@ -1,17 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUser } from '@/lib/supabase/dal'
+import type { Group } from '@/types/database'
 import Link from 'next/link'
 import GroupCard from '@/components/groups/GroupCard'
 
 export default async function HomePage() {
+  const user = await getUser()
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
 
   const { data: memberships } = await supabase
     .from('group_members')
     .select('group_id, role, groups(*)')
     .eq('user_id', user!.id)
 
-  const groups = memberships?.map(m => m.groups).filter(Boolean) ?? []
+  const groups = memberships?.map(m => m.groups).filter(Boolean) as unknown as Group[] ?? []
 
   return (
     <div className="space-y-4">
@@ -33,7 +35,7 @@ export default async function HomePage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {(groups as any[]).map(group => (
+          {groups.map(group => (
             <GroupCard key={group.id} group={group} userId={user!.id} />
           ))}
         </div>

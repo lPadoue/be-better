@@ -7,16 +7,22 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
 
   async function signInWithEmail(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
-    await supabase.auth.signInWithOtp({
+    setError(null)
+    const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
     })
-    setSent(true)
+    if (error) {
+      setError('Erreur lors de l\'envoi. Vérifie ton adresse email.')
+    } else {
+      setSent(true)
+    }
     setLoading(false)
   }
 
@@ -87,6 +93,9 @@ export default function LoginPage() {
               >
                 {loading ? 'Envoi...' : 'Recevoir un lien magique'}
               </button>
+              {error && (
+                <p className="text-red-400 text-sm text-center">{error}</p>
+              )}
             </form>
           </div>
         )}
