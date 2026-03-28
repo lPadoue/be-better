@@ -46,10 +46,10 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold">Be Better</h1>
+          <h1 className="text-4xl font-bold text-white">Be Better</h1>
           <p className="text-slate-400 mt-2">Deviens la meilleure version de toi-même</p>
         </div>
 
@@ -78,19 +78,22 @@ function LoginForm() {
                 <div className="w-full border-t border-slate-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-slate-950 px-2 text-slate-500">ou par email</span>
+                <span className="bg-slate-950 px-2 text-slate-500 text-xs uppercase tracking-widest">ou par email</span>
               </div>
             </div>
 
             <form onSubmit={signInWithEmail} className="space-y-3">
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="ton@email.com"
-                required
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-violet-500"
-              />
+              <div className="space-y-1.5">
+                <label className="text-sm text-slate-400 block">Ton adresse email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="prenom@exemple.com"
+                  required
+                  className="w-full bg-slate-800 border border-slate-600 text-white placeholder-slate-500 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
+              </div>
               <button
                 type="submit"
                 disabled={loading}
