@@ -4,10 +4,21 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+async function ensureUserRow(supabase: Awaited<ReturnType<typeof createClient>>, user: { id: string; email?: string | null; user_metadata?: Record<string, string> }) {
+  await supabase.from('users').upsert({
+    id: user.id,
+    email: user.email ?? null,
+    name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
+    avatar_url: user.user_metadata?.avatar_url ?? null,
+  }, { onConflict: 'id', ignoreDuplicates: true })
+}
+
 export async function createGroup(formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
+
+  await ensureUserRow(supabase, user)
 
   const name = formData.get('name') as string
   const description = formData.get('description') as string | null
