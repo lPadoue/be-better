@@ -12,8 +12,12 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ id: st
   const [copied, setCopied] = useState(false)
 
   async function handleGenerateLink() {
-    const link = await createInvitation(id)
-    setInviteLink(link)
+    try {
+      const link = await createInvitation(id)
+      setInviteLink(link)
+    } catch {
+      alert('Vous devez être propriétaire du groupe pour inviter des membres.')
+    }
   }
 
   async function handleCopy() {

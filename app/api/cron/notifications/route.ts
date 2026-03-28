@@ -7,6 +7,10 @@ import { DailyReminderEmail } from '@/emails/DailyReminder'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function GET(request: Request) {
+  if (!process.env.CRON_SECRET) {
+    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
+  }
+
   const authHeader = request.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -89,7 +93,7 @@ export async function GET(request: Request) {
   let sent = 0
   for (const { user, items } of Object.values(userNotifications)) {
     if (!items.length) continue
-    await resend.emails.send({
+    const { error: sendError } = await resend.emails.send({
       from: 'Be Better <rappels@yourdomain.com>',
       to: user.email,
       subject: `${items.length} action${items.length > 1 ? 's' : ''} à faire aujourd'hui`,
@@ -99,7 +103,7 @@ export async function GET(request: Request) {
         appUrl: process.env.NEXT_PUBLIC_APP_URL!,
       }),
     })
-    sent++
+    if (!sendError) sent++
   }
 
   return NextResponse.json({ sent })

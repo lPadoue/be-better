@@ -1,14 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
+
+  const searchParams = useSearchParams()
+  const next = searchParams.get('next') ?? '/'
+  const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=${encodeURIComponent(next)}`
 
   async function signInWithEmail(e: React.FormEvent) {
     e.preventDefault()
@@ -16,7 +21,7 @@ export default function LoginPage() {
     setError(null)
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
+      options: { emailRedirectTo: callbackUrl },
     })
     if (error) {
       setError('Erreur lors de l\'envoi. Vérifie ton adresse email.')
@@ -29,14 +34,14 @@ export default function LoginPage() {
   async function signInWithGoogle() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
+      options: { redirectTo: callbackUrl },
     })
   }
 
   async function signInWithApple() {
     await supabase.auth.signInWithOAuth({
       provider: 'apple',
-      options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
+      options: { redirectTo: callbackUrl },
     })
   }
 
