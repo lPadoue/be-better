@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createInvitation } from '@/lib/server/invitations'
 import { deleteGroup } from '@/lib/server/groups'
+import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { use } from 'react'
 
@@ -10,6 +11,14 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ id: st
   const { id } = use(params)
   const [inviteLink, setInviteLink] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [isGuest, setIsGuest] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => {
+      setIsGuest(data.user?.is_anonymous ?? false)
+    })
+  }, [])
 
   async function handleGenerateLink() {
     try {
@@ -37,31 +46,44 @@ export default function GroupSettingsPage({ params }: { params: Promise<{ id: st
         <h1 className="text-2xl font-bold">Paramètres du groupe</h1>
       </div>
 
-      <section className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 space-y-3">
-        <h2 className="font-semibold">Inviter quelqu'un</h2>
-        <p className="text-slate-400 text-sm">Génère un lien unique valable 7 jours.</p>
-        <button
-          onClick={handleGenerateLink}
-          className="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 rounded-xl transition"
-        >
-          Générer un lien d'invitation
-        </button>
-        {inviteLink && (
-          <div className="space-y-2">
-            <input
-              readOnly
-              value={inviteLink}
-              className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 px-3 text-sm text-slate-300"
-            />
-            <button
-              onClick={handleCopy}
-              className="w-full border border-slate-600 hover:border-slate-500 text-sm py-2.5 rounded-xl transition"
-            >
-              {copied ? '✓ Copié !' : 'Copier le lien'}
-            </button>
-          </div>
-        )}
-      </section>
+      {isGuest ? (
+        <section className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 space-y-3">
+          <h2 className="font-semibold">Inviter quelqu'un</h2>
+          <p className="text-slate-400 text-sm">Le partage est disponible avec un compte.</p>
+          <Link
+            href="/login"
+            className="block w-full bg-violet-600/20 hover:bg-violet-600/30 text-violet-400 border border-violet-500/30 font-medium py-3 rounded-xl transition text-center text-sm"
+          >
+            Créer un compte pour inviter
+          </Link>
+        </section>
+      ) : (
+        <section className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 space-y-3">
+          <h2 className="font-semibold">Inviter quelqu'un</h2>
+          <p className="text-slate-400 text-sm">Génère un lien unique valable 7 jours.</p>
+          <button
+            onClick={handleGenerateLink}
+            className="w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-3 rounded-xl transition"
+          >
+            Générer un lien d'invitation
+          </button>
+          {inviteLink && (
+            <div className="space-y-2">
+              <input
+                readOnly
+                value={inviteLink}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl py-2.5 px-3 text-sm text-slate-300"
+              />
+              <button
+                onClick={handleCopy}
+                className="w-full border border-slate-600 hover:border-slate-500 text-sm py-2.5 rounded-xl transition"
+              >
+                {copied ? '✓ Copié !' : 'Copier le lien'}
+              </button>
+            </div>
+          )}
+        </section>
+      )}
 
       <section className="bg-red-900/20 border border-red-500/30 rounded-2xl p-4 space-y-3">
         <h2 className="font-semibold text-red-400">Zone dangereuse</h2>

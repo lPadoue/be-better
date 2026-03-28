@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 function LoginForm() {
@@ -10,6 +10,7 @@ function LoginForm() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
+  const router = useRouter()
 
   const searchParams = useSearchParams()
   const next = searchParams.get('next') ?? '/'
@@ -45,6 +46,18 @@ function LoginForm() {
       provider: 'apple',
       options: { redirectTo: callbackUrl },
     })
+  }
+
+  async function signInAsGuest() {
+    setLoading(true)
+    setError(null)
+    const { error } = await supabase.auth.signInAnonymously()
+    if (error) {
+      setError('Erreur lors de la connexion invité.')
+      setLoading(false)
+    } else {
+      router.push('/')
+    }
   }
 
   return (
@@ -107,6 +120,26 @@ function LoginForm() {
                 <p className="text-red-400 text-sm text-center">{error}</p>
               )}
             </form>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-800" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-slate-950 px-2 text-slate-600 text-xs">ou</span>
+              </div>
+            </div>
+
+            <button
+              onClick={signInAsGuest}
+              disabled={loading}
+              className="w-full border border-slate-700 text-slate-400 hover:text-slate-200 hover:border-slate-500 font-medium py-3 px-4 rounded-xl transition text-sm disabled:opacity-50"
+            >
+              Continuer sans compte
+            </button>
+            <p className="text-slate-600 text-xs text-center">
+              Accès limité · partage désactivé · données liées à cet appareil
+            </p>
           </div>
         )}
       </div>
