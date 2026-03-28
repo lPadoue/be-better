@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { computeActionStatus } from '@/lib/utils/status'
-import { Resend } from 'resend'
 import { DailyReminderEmail } from '@/emails/DailyReminder'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   if (!process.env.CRON_SECRET) {
@@ -14,6 +15,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const { Resend } = await import('resend')
   const resend = new Resend(process.env.RESEND_API_KEY)
   const supabase = await createServiceClient()
   const now = new Date()
