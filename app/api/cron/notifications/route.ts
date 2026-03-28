@@ -4,8 +4,6 @@ import { computeActionStatus } from '@/lib/utils/status'
 import { Resend } from 'resend'
 import { DailyReminderEmail } from '@/emails/DailyReminder'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function GET(request: Request) {
   if (!process.env.CRON_SECRET) {
     return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
@@ -16,6 +14,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const supabase = await createServiceClient()
   const now = new Date()
   const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000)
