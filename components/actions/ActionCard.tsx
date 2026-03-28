@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useCallback, useTransition } from 'react'
 import { completeAction } from '@/lib/server/completions'
 import { computeActionStatus } from '@/lib/utils/status'
 import CompletionToast from './CompletionToast'
@@ -17,34 +17,39 @@ interface Props {
   action: Action
   lastSharedCompletion: ActionCompletion | null
   lastUserCompletion: ActionCompletion | null
-  currentUserId: string
   groupId: string
 }
 
 export default function ActionCard({
-  action, lastSharedCompletion, lastUserCompletion, currentUserId: _currentUserId, groupId
+  action, lastSharedCompletion, lastUserCompletion, groupId
 }: Props) {
   const [phrase, setPhrase] = useState<string | null>(null)
+  const [localCompletion, setLocalCompletion] = useState<Date | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  const relevantCompletion = action.sync_mode === 'shared' ? lastSharedCompletion : lastUserCompletion
+  const baseCompletion = action.sync_mode === 'shared' ? lastSharedCompletion : lastUserCompletion
+  const effectiveDate = localCompletion ?? (baseCompletion ? new Date(baseCompletion.completed_at) : null)
   const { status, progress, label } = computeActionStatus(
     action,
-    relevantCompletion ? new Date(relevantCompletion.completed_at) : null
+    effectiveDate
   )
 
   const styles = STATUS_STYLES[status]
 
   function handleDone() {
     startTransition(async () => {
+      const now = new Date()
+      setLocalCompletion(now)
       const p = await completeAction(action.id, groupId)
       setPhrase(p)
     })
   }
 
+  const handleToastDone = useCallback(() => setPhrase(null), [])
+
   return (
     <>
-      {phrase && <CompletionToast phrase={phrase} onDone={() => setPhrase(null)} />}
+      {phrase && <CompletionToast phrase={phrase} onDone={handleToastDone} />}
 
       <div className={`bg-slate-800/50 border ${styles.border} rounded-2xl p-4`}>
         <div className="flex items-center gap-3">
@@ -71,9 +76,9 @@ export default function ActionCard({
           </button>
         </div>
 
-        {action.sync_mode === 'shared' && lastSharedCompletion && (
+        {action.sync_mode === 'shared' && baseCompletion && (
           <p className="text-xs text-slate-500 mt-2 pl-8">
-            Dernière fois : {new Date(lastSharedCompletion.completed_at).toLocaleDateString('fr-FR')}
+            Dernière fois : {new Date(baseCompletion.completed_at).toLocaleDateString('fr-FR')}
           </p>
         )}
       </div>

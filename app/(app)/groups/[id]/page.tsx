@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import CreateActionForm from '@/components/actions/CreateActionForm'
 import ActionCard from '@/components/actions/ActionCard'
@@ -9,6 +9,7 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
   const { id } = await params
   const supabase = await createClient()
   const user = await getUser()
+  if (!user) redirect('/login')
 
   const { data: group } = await supabase
     .from('groups')
@@ -63,7 +64,6 @@ export default async function GroupPage({ params }: { params: Promise<{ id: stri
               action={action}
               lastSharedCompletion={lastShared}
               lastUserCompletion={lastMine}
-              currentUserId={user!.id}
               groupId={id}
             />
           )

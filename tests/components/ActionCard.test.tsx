@@ -21,7 +21,6 @@ describe('ActionCard', () => {
         action={baseAction}
         lastSharedCompletion={null}
         lastUserCompletion={null}
-        currentUserId="u1"
         groupId="g1"
       />
     )
@@ -34,7 +33,6 @@ describe('ActionCard', () => {
         action={baseAction}
         lastSharedCompletion={null}
         lastUserCompletion={null}
-        currentUserId="u1"
         groupId="g1"
       />
     )
@@ -47,7 +45,6 @@ describe('ActionCard', () => {
         action={baseAction}
         lastSharedCompletion={null}
         lastUserCompletion={null}
-        currentUserId="u1"
         groupId="g1"
       />
     )

@@ -26,12 +26,22 @@ export async function createAction(groupId: string, formData: FormData) {
     actionData.fixed_day = parseInt(formData.get('fixed_day') as string)
   }
 
-  await supabase.from('actions').insert(actionData)
+  const { error } = await supabase.from('actions').insert(actionData)
+  if (error) throw error
   revalidatePath(`/groups/${groupId}`)
 }
 
 export async function deleteAction(actionId: string, groupId: string) {
   const supabase = await createClient()
-  await supabase.from('actions').delete().eq('id', actionId)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+
+  const { error } = await supabase
+    .from('actions')
+    .delete()
+    .eq('id', actionId)
+    .eq('group_id', groupId)
+
+  if (error) throw error
   revalidatePath(`/groups/${groupId}`)
 }

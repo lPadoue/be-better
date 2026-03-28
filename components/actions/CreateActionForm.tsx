@@ -70,6 +70,7 @@ export default function CreateActionForm({ groupId }: { groupId: string }) {
                 name="recurrence_value"
                 type="number"
                 min="1"
+                required
                 defaultValue="7"
                 className="w-20 bg-slate-900 border border-slate-700 rounded-xl py-2 px-3 text-sm focus:outline-none"
               />

@@ -21,11 +21,12 @@ export async function createGroup(formData: FormData) {
 
   if (error) throw error
 
-  await supabase.from('group_members').insert({
+  const { error: memberError } = await supabase.from('group_members').insert({
     group_id: group.id,
     user_id: user.id,
     role: 'owner',
   })
+  if (memberError) throw memberError
 
   revalidatePath('/')
   redirect(`/groups/${group.id}`)

@@ -38,6 +38,7 @@ export default async function GroupCard({ group, userId }: Props) {
     .select('*')
     .in('action_id', actionIds)
     .order('completed_at', { ascending: false })
+    .limit(100)
 
   const statusCounts = { overdue: 0, warning: 0, ok: 0, never_done: 0 }
 
