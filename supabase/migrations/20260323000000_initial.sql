@@ -13,7 +13,7 @@ create type public.invitation_status as enum ('pending', 'accepted', 'expired');
 -- Users (mirrors auth.users)
 create table public.users (
   id uuid references auth.users(id) on delete cascade primary key,
-  email text not null,
+  email text,
   name text,
   avatar_url text,
   created_at timestamptz default now() not null
@@ -171,7 +171,7 @@ begin
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', split_part(new.email, '@', 1)),
+    coalesce(nullif(new.raw_user_meta_data->>'full_name', ''), nullif(new.raw_user_meta_data->>'name', ''), nullif(split_part(coalesce(new.email, ''), '@', 1), '')),
     new.raw_user_meta_data->>'avatar_url'
   );
   return new;
