@@ -13,7 +13,9 @@ function LoginForm() {
 
   const searchParams = useSearchParams()
   const next = searchParams.get('next') ?? '/'
-  const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?next=${encodeURIComponent(next)}`
+  const callbackUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
+    : `/auth/callback?next=${encodeURIComponent(next)}`
 
   async function signInWithEmail(e: React.FormEvent) {
     e.preventDefault()
