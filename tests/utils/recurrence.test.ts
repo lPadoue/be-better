@@ -82,4 +82,8 @@ describe('defaultWarningDays', () => {
   it('returns minimum 1', () => {
     expect(defaultWarningDays('relative', 1, 'days')).toBe(1)
   })
+
+  it('returns minimum 1 for hours (20% rounds to 0)', () => {
+    expect(defaultWarningDays('relative', 4, 'hours')).toBe(1) // 4/24 * 0.2 = 0.03 → floor = 0 → max(1,0) = 1
+  })
 })

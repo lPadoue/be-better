@@ -77,3 +77,26 @@ describe('computeActionStatus — fixed', () => {
     expect(result.status).toBe('warning')
   })
 })
+
+describe('formatLabel branches', () => {
+  it('returns "Demain" when due tomorrow', () => {
+    const lastCompletion = new Date('2026-03-01')
+    const now = new Date('2026-03-07') // nextDue = March 8, exactly 1 day away
+    const result = computeActionStatus(relativeAction, lastCompletion, now)
+    expect(result.label).toBe('Demain')
+  })
+
+  it('returns "Dans Xj" when due in multiple days', () => {
+    const lastCompletion = new Date('2026-03-01')
+    const now = new Date('2026-03-03') // nextDue = March 8, 5 days away
+    const result = computeActionStatus(relativeAction, lastCompletion, now)
+    expect(result.label).toBe('Dans 5j')
+  })
+
+  it('returns "En retard" when overdue same day', () => {
+    const lastCompletion = new Date('2026-03-01')
+    const now = new Date('2026-03-08T12:00:00') // same day as nextDue but hours after
+    const result = computeActionStatus(relativeAction, lastCompletion, now)
+    expect(result.label).toBe('En retard')
+  })
+})
