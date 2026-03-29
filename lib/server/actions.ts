@@ -1,24 +1,14 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-
-async function ensureUserRow(supabase: Awaited<ReturnType<typeof createClient>>, user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) {
-  await supabase.from('users').upsert({
-    id: user.id,
-    email: user.email ?? null,
-    name: user.user_metadata?.full_name ?? user.user_metadata?.name ?? null,
-    avatar_url: user.user_metadata?.avatar_url ?? null,
-  }, { onConflict: 'id', ignoreDuplicates: true })
-}
 
 export async function createAction(groupId: string, formData: FormData) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
-  await ensureUserRow(supabase, user)
-
+  const db = await createServiceClient()
   const recurrenceType = formData.get('recurrence_type') as 'relative' | 'fixed'
 
   const actionData: Record<string, unknown> = {
@@ -37,7 +27,7 @@ export async function createAction(groupId: string, formData: FormData) {
     actionData.fixed_day = parseInt(formData.get('fixed_day') as string)
   }
 
-  const { error } = await supabase.from('actions').insert(actionData)
+  const { error } = await db.from('actions').insert(actionData)
   if (error) throw error
   revalidatePath(`/groups/${groupId}`)
 }
@@ -47,7 +37,8 @@ export async function deleteAction(actionId: string, groupId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
-  const { error } = await supabase
+  const db = await createServiceClient()
+  const { error } = await db
     .from('actions')
     .delete()
     .eq('id', actionId)

@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 
 export async function completeAction(actionId: string, groupId: string): Promise<string> {
@@ -8,12 +8,14 @@ export async function completeAction(actionId: string, groupId: string): Promise
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
 
-  await supabase.from('action_completions').insert({
+  const db = await createServiceClient()
+
+  await db.from('action_completions').insert({
     action_id: actionId,
     user_id: user.id,
   })
 
-  const { data: encouragements } = await supabase
+  const { data: encouragements } = await db
     .from('encouragements')
     .select('text')
     .eq('status', 'active')
