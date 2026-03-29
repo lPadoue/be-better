@@ -1,28 +1,59 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0D0B09;
+  --surface: #161310;
+  --surface-raised: #1E1A16;
+  --surface-hover: #252019;
+  --border: #2C2620;
+  --border-muted: #221E1A;
+  --text: #F2EAE0;
+  --text-muted: #8C7E72;
+  --text-subtle: #4A3F37;
+  --accent: #E8A44A;
+  --accent-hover: #F0B55E;
+  --accent-dark: #2E1F05;
+  --success: #5A9966;
+  --success-dark: #0D2410;
+  --warning: #CC7A3A;
+  --warning-dark: #2A1505;
+  --danger: #B85555;
+  --danger-dark: #2A0A0A;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-bb-bg: var(--bg);
+  --color-bb-surface: var(--surface);
+  --color-bb-raised: var(--surface-raised);
+  --color-bb-hover: var(--surface-hover);
+  --color-bb-border: var(--border);
+  --color-bb-border-muted: var(--border-muted);
+  --color-bb-text: var(--text);
+  --color-bb-muted: var(--text-muted);
+  --color-bb-subtle: var(--text-subtle);
+  --color-bb-accent: var(--accent);
+  --color-bb-accent-hover: var(--accent-hover);
+  --color-bb-accent-dark: var(--accent-dark);
+  --color-bb-success: var(--success);
+  --color-bb-success-dark: var(--success-dark);
+  --color-bb-warning: var(--warning);
+  --color-bb-warning-dark: var(--warning-dark);
+  --color-bb-danger: var(--danger);
+  --color-bb-danger-dark: var(--danger-dark);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+input, select, textarea {
+  color: var(--text);
+  background: var(--surface-raised);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-subtle);
 }
 
 @keyframes bounce-in {
@@ -32,4 +63,20 @@ body {
 }
 .animate-bounce-in {
   animation: bounce-in 0.4s ease-out;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.animate-slide-up {
+  animation: slide-up 0.25s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
 }

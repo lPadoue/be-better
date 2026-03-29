@@ -16,22 +16,33 @@ export default async function HomePage() {
   const groups = memberships?.map(m => m.groups).filter(Boolean) as unknown as Group[] ?? []
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Mes groupes</h1>
+        <div>
+          <h1 className="font-[family-name:var(--font-serif)] text-2xl text-[#F2EAE0] tracking-tight">Mes groupes</h1>
+          <p className="text-[#8C7E72] text-xs mt-0.5">{groups.length} groupe{groups.length !== 1 ? 's' : ''}</p>
+        </div>
         <Link
           href="/groups/new"
-          className="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-xl text-sm font-medium transition"
+          className="bg-[#E8A44A] hover:bg-[#F0B55E] text-[#0D0B09] px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200"
         >
           + Nouveau
         </Link>
       </div>
 
       {groups.length === 0 ? (
-        <div className="text-center py-16 text-slate-500">
-          <p className="text-4xl mb-4">🌱</p>
-          <p className="font-medium">Aucun groupe encore</p>
-          <p className="text-sm mt-1">Crée ton premier groupe pour commencer</p>
+        <div className="text-center py-20">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#1E1A16] border border-[#2C2620] mb-5">
+            <span className="text-3xl">🌱</span>
+          </div>
+          <p className="font-medium text-[#F2EAE0]">Aucun groupe encore</p>
+          <p className="text-sm text-[#8C7E72] mt-1">Crée ton premier groupe pour commencer</p>
+          <Link
+            href="/groups/new"
+            className="inline-block mt-5 bg-[#E8A44A] hover:bg-[#F0B55E] text-[#0D0B09] px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200"
+          >
+            Créer un groupe
+          </Link>
         </div>
       ) : (
         <div className="space-y-3">

@@ -19,13 +19,16 @@ export default async function GroupCard({ group, userId }: Props) {
   if (!actions?.length) {
     return (
       <Link href={`/groups/${group.id}`}>
-        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 hover:border-slate-600 transition">
+        <div className="bg-[#161310] border border-[#2C2620] hover:border-[#3C3228] rounded-2xl p-4 transition-all duration-200 group">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">{group.emoji ?? '📋'}</span>
-            <div>
-              <p className="font-semibold">{group.name}</p>
-              <p className="text-slate-500 text-sm">Aucune action</p>
+            <div className="w-10 h-10 rounded-xl bg-[#1E1A16] flex items-center justify-center text-xl shrink-0">
+              {group.emoji ?? '📋'}
             </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-[#F2EAE0] truncate">{group.name}</p>
+              <p className="text-[#4A3F37] text-xs mt-0.5">Aucune action</p>
+            </div>
+            <span className="text-[#4A3F37] group-hover:text-[#8C7E72] transition-colors text-lg">›</span>
           </div>
         </div>
       </Link>
@@ -55,31 +58,38 @@ export default async function GroupCard({ group, userId }: Props) {
     statusCounts[status]++
   }
 
+  const total = actions.length
+  const okCount = statusCounts.ok + statusCounts.never_done
+
   return (
     <Link href={`/groups/${group.id}`}>
-      <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 hover:border-slate-600 transition">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{group.emoji ?? '📋'}</span>
-            <p className="font-semibold">{group.name}</p>
+      <div className="bg-[#161310] border border-[#2C2620] hover:border-[#3C3228] rounded-2xl p-4 transition-all duration-200 group">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#1E1A16] flex items-center justify-center text-xl shrink-0">
+            {group.emoji ?? '📋'}
           </div>
-          <div className="flex gap-1.5">
-            {statusCounts.overdue > 0 && (
-              <span className="bg-red-500/20 text-red-400 text-xs px-2 py-1 rounded-full font-medium">
-                {statusCounts.overdue} en retard
-              </span>
-            )}
-            {statusCounts.warning > 0 && (
-              <span className="bg-orange-500/20 text-orange-400 text-xs px-2 py-1 rounded-full font-medium">
-                {statusCounts.warning} bientôt
-              </span>
-            )}
-            {statusCounts.overdue === 0 && statusCounts.warning === 0 && (
-              <span className="bg-green-500/20 text-green-400 text-xs px-2 py-1 rounded-full font-medium">
-                ✓ OK
-              </span>
-            )}
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-[#F2EAE0] truncate">{group.name}</p>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
+              <p className="text-[#8C7E72] text-xs">{total} action{total !== 1 ? 's' : ''}</p>
+              {statusCounts.overdue > 0 && (
+                <span className="bg-[#2A0A0A] text-[#B85555] text-xs px-2 py-0.5 rounded-full">
+                  {statusCounts.overdue} en retard
+                </span>
+              )}
+              {statusCounts.warning > 0 && (
+                <span className="bg-[#2A1505] text-[#CC7A3A] text-xs px-2 py-0.5 rounded-full">
+                  {statusCounts.warning} bientôt
+                </span>
+              )}
+              {statusCounts.overdue === 0 && statusCounts.warning === 0 && okCount > 0 && (
+                <span className="bg-[#0D2410] text-[#5A9966] text-xs px-2 py-0.5 rounded-full">
+                  ✓ À jour
+                </span>
+              )}
+            </div>
           </div>
+          <span className="text-[#4A3F37] group-hover:text-[#8C7E72] transition-colors text-lg">›</span>
         </div>
       </div>
     </Link>
